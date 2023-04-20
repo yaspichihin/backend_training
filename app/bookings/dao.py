@@ -1,0 +1,101 @@
+from datetime import date
+from sqlalchemy import and_, select
+
+from app.dao.base import BaseDAO
+
+from app.users.models import Users
+from app.bookings.models import Bookings
+from app.hotels.rooms.models import Rooms
+
+from app.bookings.schemas import SBooking, SBookingWithRoomInfo
+
+from app.db import async_session_maker
+
+from app.exceptions import (
+    BookingDoesNotExist,
+    DateFromMoreOrEqualDateTo,
+    RoomCannotBeBooked)
+
+
+class BookingDAO(BaseDAO):
+    model  = Bookings
+
+    @classmethod
+    async def get_booked_rooms(
+        cls,
+        room_id: int,
+        date_from: date,
+        date_to: date,
+    ) -> int:
+        # Проверка заданных дат
+        if date_from >= date_to:
+            raise DateFromMoreOrEqualDateTo
+        # Вернуть количество забронированных комнат
+        return await cls.select_all_filter(and_(Bookings.room_id == room_id,
+            and_(Bookings.date_to >= date_from, Bookings.date_from <= date_to)))
+
+    @classmethod
+    async def get_booking_for_user(
+        cls,
+        user: Users,
+    ) -> list[SBookingWithRoomInfo]:
+        async with async_session_maker() as session:
+            query = (
+                select(
+                    Bookings.room_id,
+                    Bookings.user_id,
+                    Bookings.date_from,
+                    Bookings.date_to,
+                    Bookings.price,
+                    Bookings.total_cost,
+                    Bookings.total_days,
+                    Rooms.image_id,
+                    Rooms.name,
+                    Rooms.description,
+                    Rooms.services,
+                )
+                .select_from(Bookings)
+                .join(Rooms, Bookings.room_id == Rooms.id, isouter=True)
+                .where(Bookings.user_id == user.id))
+
+            result = await session.execute(query)
+
+            keys = ["room_id", "user_id", "date_from", "date_to",
+                    "price", "total_cost", "total_days", "image_id",
+                    "name", "description", "services"]
+            
+            return [dict(zip(keys, row)) for row in result.fetchall()]
+        
+    @classmethod
+    async def add_booking_for_user(
+        cls,
+        user_id: int,
+        room_id: int,
+        date_from: date,
+        date_to: date,
+    ) -> SBooking:
+        booked_rooms: int = len(await cls.get_booked_rooms(room_id, date_from, date_to))
+        async with async_session_maker() as session:
+            total_rooms: int = (await session.execute(
+                select(Rooms.quantity).filter_by(id = room_id))).scalar()
+            # Если комнат для бронирования нет выводи ошибку
+            if not total_rooms - booked_rooms:
+                raise RoomCannotBeBooked
+            # Получаем стоимость комнаты за 1 день
+            price: int = (await session.execute(
+                select(Rooms.price).filter_by(id=room_id))).scalar()
+            # Добавим бронь
+            return (await cls.add_rows(room_id = room_id, user_id = user_id,
+                date_from = date_from, date_to = date_to, price = price)).scalar()
+            
+    @classmethod        
+    async def delete_booking_for_user(
+        cls,
+        booking_id: int,
+        user_id: int,
+    ) -> None:
+        # Проверка наличия брони пользователем
+        if not await cls.select_one_or_none_filter_by(id=booking_id, user_id=user_id):
+            raise BookingDoesNotExist
+        # Удаляем бронь
+        await cls.delete_rows_filer_by(id=booking_id, user_id=user_id)
