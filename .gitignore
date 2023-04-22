@@ -1,1 +1,7 @@
-.env, backend_venv/*
+backend_venv
+.env
+.env-non-dev
+.env-render
+__pycache__
+# *.ipynb*
+.pytest_cache
