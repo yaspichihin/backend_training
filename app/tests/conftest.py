@@ -30,7 +30,7 @@ async def prepare_database():
     def open_mock_json(model: str):
         with open(f"app/tests/mock_{model}.json", encoding="utf-8") as file:
             return json.load(file)
-        
+
     hotels = open_mock_json("hotels")
     rooms = open_mock_json("rooms")
     users = open_mock_json("users")
@@ -43,7 +43,7 @@ async def prepare_database():
     async with async_session_maker() as session:
         add_hotels = insert(Hotels).values(hotels)
         add_rooms = insert(Rooms).values(rooms)
-        add_users = insert(Users).values(users)             # Добавлять перед Bookings из-за связей
+        add_users = insert(Users).values(users)  # Добавлять перед Bookings из-за связей
         add_bookings = insert(Bookings).values(bookings)
 
         await session.execute(add_hotels)
@@ -62,7 +62,9 @@ def event_loop(request):
     yield loop
     loop.close()
 
+
 # function - чистый клиент без cookies
+
 
 # Создадим чистый клиент
 @pytest.fixture(scope="function")
@@ -77,16 +79,18 @@ async def session():
     async with async_session_maker() as session:
         yield session
 
+
 # session - 1 раз залогинить на сессию
 # Фикстура залогиненного пользователя
 @pytest.fixture(scope="session")
 async def async_auth_client():
-    async with AsyncClient(app=fastapi_app, base_url="http://test") as async_auth_client:
+    async with AsyncClient(
+        app=fastapi_app, base_url="http://test"
+    ) as async_auth_client:
         # Залогинем пользователя
-        await async_auth_client.post("/auth/login", json={
-            "email": "test@test.com",
-            "password": "test"
-        })
+        await async_auth_client.post(
+            "/auth/login", json={"email": "test@test.com", "password": "test"}
+        )
         # Проверим наличие jwt токена
         assert async_auth_client.cookies["booking_access_token"]
         yield async_auth_client

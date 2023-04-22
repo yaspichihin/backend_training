@@ -19,16 +19,17 @@ class RoomsDAO(BaseDAO):
         # Создадим список для формирования ответа
         result: list = []
         # Получим все комнаты по hotel_id
-        rooms: list[SRooms] = [room for room in
-                await cls.select_all_filter(Rooms.hotel_id == hotel_id)]
+        rooms: list[SRooms] = [
+            room for room in await cls.select_all_filter(Rooms.hotel_id == hotel_id)
+        ]
         # Подсчитаем доступное количество комнат
         for room in rooms:
-                rooms_qty = room.quantity
-                rooms_booked = len(await BookingDAO.get_booked_rooms(
-                     room.id, date_from, date_to))
-                rooms_left: int = rooms_qty - rooms_booked
-                if rooms_left:
-                    room.rooms_left = rooms_left
-                    result.append(room)
+            rooms_qty = room.quantity
+            rooms_booked = len(
+                await BookingDAO.get_booked_rooms(room.id, date_from, date_to)
+            )
+            rooms_left: int = rooms_qty - rooms_booked
+            if rooms_left:
+                room.rooms_left = rooms_left
+                result.append(room)
         return result
-                        

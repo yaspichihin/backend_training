@@ -23,16 +23,14 @@ def get_token(
         raise TokenAbsentException
     return token
 
+
 # Определение какой именно пользователь перед нами
 async def get_current_user(
     token: str = Depends(get_token),
 ) -> Users:
     # Попытка декодировать токен
     try:
-        payload = jwt.decode(
-            token,
-            settings.jwt_secret_key,
-            settings.jwt_algorithm)
+        payload = jwt.decode(token, settings.jwt_secret_key, settings.jwt_algorithm)
     except JWTError:
         raise IncorrcetTokenFormatException
     # Проверим срок действия токена
@@ -44,11 +42,12 @@ async def get_current_user(
     if not user_id:
         raise UserIsNotPresentException
     # Проверим наличие пользователя в DB
-    user = await UsersDAO.select_one_or_none_filter_by(id = int(user_id))
+    user = await UsersDAO.select_one_or_none_filter_by(id=int(user_id))
     if not user:
         raise UserIsNotPresentException
     # Возращаем модель пользователя
     return user
+
 
 # Определение является ли пользователь админом
 async def get_current_admin_user(

@@ -12,20 +12,20 @@ class BaseDAO:
             query = select(cls.model).filter(*args, **kwargs)
             result = await session.execute(query)
             return result.scalars().all()
-        
+
     @classmethod
     async def select_all_filter_by(cls, *args, **kwargs):
         async with async_session_maker() as session:
             query = select(cls.model).filter_by(*args, **kwargs)
             result = await session.execute(query)
             return result.scalars().all()
-        
+
     @classmethod
     async def select_one_or_none_filter(cls, *args, **kwargs):
         async with async_session_maker() as session:
             query = select(cls.model).filter(*args, **kwargs)
             result = await session.execute(query)
-            return result.scalar_one_or_none() 
+            return result.scalar_one_or_none()
 
     @classmethod
     async def select_one_or_none_filter_by(cls, *args, **kwargs):

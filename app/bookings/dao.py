@@ -65,20 +65,9 @@ class BookingDAO(BaseDAO):
 
             result = await session.execute(query)
 
-            keys = [
-                "id",
-                "room_id",
-                "user_id",
-                "date_from",
-                "date_to",
-                "price",
-                "total_cost",
-                "total_days",
-                "image_id",
-                "name",
-                "description",
-                "services",
-            ]
+            keys = ["id", "room_id", "user_id", "date_from", "date_to",
+                    "price", "total_cost", "total_days", "image_id", "name",
+                    "description", "services"]
 
             return [dict(zip(keys, row)) for row in result.fetchall()]
 

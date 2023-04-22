@@ -5,18 +5,19 @@ from os.path import abspath, dirname
 from alembic import context
 from sqlalchemy import engine_from_config, pool
 
-# Передаем информацию alemic, что он находится в папке app, чтобы отрабатывали следующие импорты
-sys.path.insert(0, dirname(dirname(dirname(abspath(__file__))))) 
-
-from app.bookings.models import Bookings  # Импорт модели для передачи данных в Base
+from app.bookings.models import Bookings  # noqa
 from app.config import settings  # Импорт логинов, паролей и прочего
-from app.db import (
-    Base,  # Если импортировать только его, то он пустой по умолчанию. Нужно импортировать и все модели.
-)
-from app.hotels.models import Hotels        # noqa  # Импорт модели для передачи данных в Base
-from app.hotels.rooms.models import Rooms   # noqa  # Импорт модели для передачи данных в Base
-from app.users.models import Users          # noqa  # Импорт модели для передачи данных в Base
-from app.bookings.models import Bookings    # noqa  # Импорт модели для передачи данных в Base
+
+# Если импортировать только его, то он пустой по умолчанию.
+# Нужно импортировать и все модели.
+from app.db import Base
+from app.hotels.models import Hotels  # noqa
+from app.hotels.rooms.models import Rooms  # noqa
+from app.users.models import Users  # noqa
+
+# Передаем информацию alemic, что он находится в папке app,
+# чтобы отрабатывали следующие импорты
+sys.path.insert(0, dirname(dirname(dirname(abspath(__file__)))))
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -80,9 +81,7 @@ def run_migrations_online() -> None:
     )
 
     with connectable.connect() as connection:
-        context.configure(
-            connection=connection, target_metadata=target_metadata
-        )
+        context.configure(connection=connection, target_metadata=target_metadata)
 
         with context.begin_transaction():
             context.run_migrations()

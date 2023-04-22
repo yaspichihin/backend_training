@@ -3,7 +3,6 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi_cache import FastAPICache
 from fastapi_cache.backends.redis import RedisBackend
-from fastapi_cache.decorator import cache
 from redis import asyncio as aioredis
 from sqladmin import Admin
 
@@ -19,7 +18,7 @@ from app.pages.router import router as router_pages
 from app.users.router import router_auth as router_auth
 from app.users.router import router_auth as router_user
 
-app =  FastAPI()
+app = FastAPI()
 
 # Роутер для api
 app.include_router(router_auth)
@@ -48,8 +47,14 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
     allow_credentials=True,
-    allow_methods=['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
-    allow_headers=["Content-Type", "Set-Cookie", "Access-Control-Allow-Headers", "Access-Control-Allow-Origin", "Access-Authorization"]
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
+    allow_headers=[
+        "Content-Type",
+        "Set-Cookie",
+        "Access-Control-Allow-Headers",
+        "Access-Control-Allow-Origin",
+        "Access-Authorization",
+    ],
 )
 
 
@@ -57,8 +62,11 @@ app.add_middleware(
 # Данный декоратор прогоняет код перед запуском FastAPI
 @app.on_event("startup")
 async def startup():
-    redis = await aioredis.from_url(settings.redis_url, encoding="utf8", decode_responses=True)
+    redis = await aioredis.from_url(
+        settings.redis_url, encoding="utf8", decode_responses=True
+    )
     FastAPICache.init(RedisBackend(redis), prefix="fastapi")
+
 
 # Данный декоратор прогоняет код после завершения программы
 @app.on_event("shutdown")

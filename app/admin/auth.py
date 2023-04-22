@@ -1,11 +1,9 @@
 from typing import Optional
 
-from sqladmin import Admin
 from sqladmin.authentication import AuthenticationBackend
 from starlette.requests import Request
 from starlette.responses import RedirectResponse
 
-from app.exceptions import IncorrectEmailOrPasswordException
 from app.users.auth import authenticate_user, create_access_token
 from app.users.dependencies import get_current_user
 
@@ -28,5 +26,6 @@ class AdminAuth(AuthenticationBackend):
         token = request.session.get("token")
         if not token or not await get_current_user(token):
             return RedirectResponse(request.url_for("admin:login"), status_code=302)
-        
+
+
 authentication_backend = AdminAuth(secret_key="...")

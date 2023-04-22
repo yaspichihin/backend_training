@@ -4,10 +4,8 @@ from fastapi import APIRouter, Response, UploadFile
 
 from app.tasks.tasks import process_pic
 
-router = APIRouter(
-    prefix="/images",
-    tags=["Upload Images"]
-)
+router = APIRouter(prefix="/images", tags=["Upload Images"])
+
 
 @router.post("/hotels")
 async def add_hotel_image(
@@ -20,4 +18,3 @@ async def add_hotel_image(
         shutil.copyfileobj(file.file, file_object)
     process_pic.delay(im_path)
     response.status_code = 201
-

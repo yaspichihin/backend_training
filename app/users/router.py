@@ -7,17 +7,12 @@ from app.users.dependencies import get_current_admin_user, get_current_user
 from app.users.models import Users
 from app.users.schemas import SAuth, SUsers
 
-router_auth = APIRouter(
-    prefix = "/auth",
-    tags = ["Auth"]
-)
+router_auth = APIRouter(prefix="/auth", tags=["Auth"])
 
-router_user = APIRouter(
-    prefix = "/user",
-    tags = ["Users"]
-)
+router_user = APIRouter(prefix="/user", tags=["Users"])
 
 # router_auth
+
 
 @router_auth.post("/register")
 async def register_user(
@@ -32,6 +27,7 @@ async def register_user(
     await UsersDAO.add_rows(email=user_data.email, hashed_password=hashed_password)
     return "Успешная регистрация"
 
+
 @router_auth.post("/login")
 async def login_user(
     response: Response,
@@ -44,6 +40,7 @@ async def login_user(
     response.set_cookie("booking_access_token", access_token, httponly=True)
     return "Успешный вход"
 
+
 @router_auth.post("/logout")
 async def logout_user(
     response: Response,
@@ -55,11 +52,13 @@ async def logout_user(
 
 # router_user
 
+
 @router_user.get("/me")
 async def get_me(
     current_user: Users = Depends(get_current_user),
 ) -> SUsers:
     return current_user
+
 
 @router_user.get("/all")
 async def get_all_users(
