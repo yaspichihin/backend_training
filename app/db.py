@@ -4,6 +4,7 @@ from sqlalchemy.orm import DeclarativeBase, sessionmaker
 
 from app.config import settings
 
+
 # Составим ссылку для подключения, требует SQLAlchemy
 if settings.mode == "test":
     databse_url = settings.databse_test_url
@@ -17,7 +18,6 @@ engine = create_async_engine(databse_url, **databse_params)
 
 # Создадим фабрику(Генератор сессий/транзакций)
 async_session_maker = sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
-
 
 # Класс для миграций, тут будут собираться данные от всех моделей,
 # которые будут наследоваться от этого класса, чтобы alembic мог сравнить

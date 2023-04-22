@@ -16,12 +16,11 @@ class UsersAdmin(ModelView, model=Users):
 
 
 class BookingsAdmin(ModelView, model=Bookings):
-    column_list = [
-        c.name for c in Bookings.__table__.c
-    ]  # Взять из модели все названия колонок
+    # Взять из модели все названия колонок
+    column_list = [c.name for c in Bookings.__table__.c]
     column_list += [Bookings.user, Bookings.room]
-    name = "Booking"  # Имя строки
-    name_plural = "Bookings"  # Имя таблицы
+    name = "Booking"
+    name_plural = "Bookings"
     icon = "fa-solid fa-calendar"
 
 

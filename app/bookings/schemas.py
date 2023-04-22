@@ -28,7 +28,7 @@ class SBookingWithRoomInfo(BaseModel):
     total_days: int
     image_id: int
     name: str
-    description: str | None
+    description: str|None
     services: list[str]
 
     class Config:

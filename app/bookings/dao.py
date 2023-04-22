@@ -20,12 +20,7 @@ class BookingDAO(BaseDAO):
     model = Bookings
 
     @classmethod
-    async def get_booked_rooms(
-        cls,
-        room_id: int,
-        date_from: date,
-        date_to: date,
-    ) -> int:
+    async def get_booked_rooms(cls, room_id: int, date_from: date, date_to: date) -> int:
         # Проверка заданных дат
         if date_from >= date_to:
             raise DateFromMoreOrEqualDateToException
@@ -38,10 +33,7 @@ class BookingDAO(BaseDAO):
         )
 
     @classmethod
-    async def get_booking_for_user(
-        cls,
-        user: Users,
-    ) -> list[SBookingWithRoomInfo]:
+    async def get_booking_for_user(cls, user: Users) -> list[SBookingWithRoomInfo]:
         async with async_session_maker() as session:
             query = (
                 select(
@@ -64,53 +56,30 @@ class BookingDAO(BaseDAO):
             )
 
             result = await session.execute(query)
-
-            keys = ["id", "room_id", "user_id", "date_from", "date_to",
-                    "price", "total_cost", "total_days", "image_id", "name",
-                    "description", "services"]
-
-            return [dict(zip(keys, row)) for row in result.fetchall()]
+            return result.all()
 
     @classmethod
-    async def add_booking_for_user(
-        cls,
-        user_id: int,
-        room_id: int,
-        date_from: date,
-        date_to: date,
-    ) -> SBooking:
+    async def add_booking_for_user(cls, user_id: int, room_id: int,
+        date_from: date, date_to: date) -> SBooking:
         # Дата выезда - Дата заезда > 30 дней (неверные параметры)
         if date_from + timedelta(days=30) < date_to:
             raise LongBookingException
         booked_rooms: int = len(await cls.get_booked_rooms(room_id, date_from, date_to))
         async with async_session_maker() as session:
-            total_rooms: int = (
-                await session.execute(select(Rooms.quantity).filter_by(id=room_id))
-            ).scalar()
+            total_rooms: int = (await session.execute(
+                select(Rooms.quantity).filter_by(id=room_id))).scalar()
             # Если комнат для бронирования нет выводи ошибку
             if not total_rooms - booked_rooms:
                 raise RoomCannotBeBookedException
             # Получаем стоимость комнаты за 1 день
-            price: int = (
-                await session.execute(select(Rooms.price).filter_by(id=room_id))
-            ).scalar()
+            price: int = (await session.execute(
+                select(Rooms.price).filter_by(id=room_id))).scalar()
             # Добавим бронь
-            return (
-                await cls.add_rows(
-                    room_id=room_id,
-                    user_id=user_id,
-                    date_from=date_from,
-                    date_to=date_to,
-                    price=price,
-                )
-            ).scalar()
+            return (await cls.add_rows(room_id=room_id,user_id=user_id,
+                date_from=date_from,date_to=date_to,price=price)).scalar()
 
     @classmethod
-    async def delete_booking_for_user(
-        cls,
-        booking_id: int,
-        user_id: int,
-    ) -> None:
+    async def delete_booking_for_user(cls, booking_id: int, user_id: int) -> None:
         # Проверка наличия брони пользователем
         if not await cls.select_one_or_none_filter_by(id=booking_id, user_id=user_id):
             raise BookingDoesNotExistException

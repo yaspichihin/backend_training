@@ -27,5 +27,4 @@ class AdminAuth(AuthenticationBackend):
         if not token or not await get_current_user(token):
             return RedirectResponse(request.url_for("admin:login"), status_code=302)
 
-
 authentication_backend = AdminAuth(secret_key="...")

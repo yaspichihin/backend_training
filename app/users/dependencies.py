@@ -15,19 +15,14 @@ from app.users.models import Users
 
 
 # Получение данных, которые должны храниться в токене клиента
-def get_token(
-    request: Request,
-) -> str:
+def get_token(request: Request) -> str:
     token = request.cookies.get("booking_access_token")
     if not token:
         raise TokenAbsentException
     return token
 
-
 # Определение какой именно пользователь перед нами
-async def get_current_user(
-    token: str = Depends(get_token),
-) -> Users:
+async def get_current_user(token: str = Depends(get_token)) -> Users:
     # Попытка декодировать токен
     try:
         payload = jwt.decode(token, settings.jwt_secret_key, settings.jwt_algorithm)
@@ -48,11 +43,8 @@ async def get_current_user(
     # Возращаем модель пользователя
     return user
 
-
 # Определение является ли пользователь админом
-async def get_current_admin_user(
-    current_user: Users = Depends(get_current_user),
-) -> Users:
+async def get_current_admin_user(current_user: Users = Depends(get_current_user)) -> Users:
     # Т.к. Админов пока нет, пускай каждый пользователь админ
     # if current_user.role != "Administrator":
     #     raise UserIsNotAdminException

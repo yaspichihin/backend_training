@@ -5,7 +5,6 @@ from os.path import abspath, dirname
 from alembic import context
 from sqlalchemy import engine_from_config, pool
 
-from app.bookings.models import Bookings  # noqa
 from app.config import settings  # Импорт логинов, паролей и прочего
 
 # Если импортировать только его, то он пустой по умолчанию.
@@ -14,6 +13,7 @@ from app.db import Base
 from app.hotels.models import Hotels  # noqa
 from app.hotels.rooms.models import Rooms  # noqa
 from app.users.models import Users  # noqa
+from app.bookings.models import Bookings  # noqa
 
 # Передаем информацию alemic, что он находится в папке app,
 # чтобы отрабатывали следующие импорты

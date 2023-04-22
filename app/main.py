@@ -18,6 +18,7 @@ from app.pages.router import router as router_pages
 from app.users.router import router_auth as router_auth
 from app.users.router import router_auth as router_user
 
+
 app = FastAPI()
 
 # Роутер для api
@@ -27,14 +28,12 @@ app.include_router(router_bookings)
 app.include_router(router_hotels)
 app.include_router(router_rooms)
 
-
 # Роутер для frontend
 app.include_router(router_pages)
 
 # Добавление картинок
 app.mount("/static", StaticFiles(directory="app/static"), "static")
 app.include_router(router_images)
-
 
 # Добавим площадки с которых к нам хотят обращаться
 origins = [
@@ -57,22 +56,18 @@ app.add_middleware(
     ],
 )
 
-
 # Добавление Redis для кэширования частых запросов
 # Данный декоратор прогоняет код перед запуском FastAPI
 @app.on_event("startup")
 async def startup():
     redis = await aioredis.from_url(
-        settings.redis_url, encoding="utf8", decode_responses=True
-    )
+        settings.redis_url, encoding="utf8", decode_responses=True)
     FastAPICache.init(RedisBackend(redis), prefix="fastapi")
-
 
 # Данный декоратор прогоняет код после завершения программы
 @app.on_event("shutdown")
 def shutdown_event():
     pass
-
 
 # Настрока Админки
 admin = Admin(app, engine, authentication_backend=authentication_backend)
