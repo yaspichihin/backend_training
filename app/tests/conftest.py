@@ -1,10 +1,10 @@
 import asyncio
 from datetime import datetime
-import warnings
 import pytest
 from sqlalchemy import insert
-from app.config import settings
 import json
+
+from app.config import settings
 from app.db import Base, async_session_maker, engine
 
 from app.bookings.models import Bookings
@@ -12,7 +12,6 @@ from app.hotels.models import Hotels
 from app.hotels.rooms.models import Rooms
 from app.users.models import Users
 
-from fastapi.testclient import TestClient
 from httpx import AsyncClient
 from app.main import app as fastapi_app
 
