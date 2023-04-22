@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, timedelta
 from sqlalchemy import and_, select
 
 from app.dao.base import BaseDAO
@@ -12,9 +12,10 @@ from app.bookings.schemas import SBooking, SBookingWithRoomInfo
 from app.db import async_session_maker
 
 from app.exceptions import (
-    BookingDoesNotExist,
-    DateFromMoreOrEqualDateTo,
-    RoomCannotBeBooked)
+    BookingDoesNotExistException,
+    DateFromMoreOrEqualDateToException,
+    LongBookingException,
+    RoomCannotBeBookedException)
 
 
 class BookingDAO(BaseDAO):
@@ -29,7 +30,7 @@ class BookingDAO(BaseDAO):
     ) -> int:
         # Проверка заданных дат
         if date_from >= date_to:
-            raise DateFromMoreOrEqualDateTo
+            raise DateFromMoreOrEqualDateToException
         # Вернуть количество забронированных комнат
         return await cls.select_all_filter(and_(Bookings.room_id == room_id,
             and_(Bookings.date_to >= date_from, Bookings.date_from <= date_to)))
@@ -42,6 +43,7 @@ class BookingDAO(BaseDAO):
         async with async_session_maker() as session:
             query = (
                 select(
+                    Bookings.id,
                     Bookings.room_id,
                     Bookings.user_id,
                     Bookings.date_from,
@@ -60,7 +62,7 @@ class BookingDAO(BaseDAO):
 
             result = await session.execute(query)
 
-            keys = ["room_id", "user_id", "date_from", "date_to",
+            keys = ["id", "room_id", "user_id", "date_from", "date_to",
                     "price", "total_cost", "total_days", "image_id",
                     "name", "description", "services"]
             
@@ -74,13 +76,16 @@ class BookingDAO(BaseDAO):
         date_from: date,
         date_to: date,
     ) -> SBooking:
+        # Дата выезда - Дата заезда > 30 дней (неверные параметры)
+        if date_from + timedelta(days=30) < date_to:
+            raise LongBookingException
         booked_rooms: int = len(await cls.get_booked_rooms(room_id, date_from, date_to))
         async with async_session_maker() as session:
             total_rooms: int = (await session.execute(
                 select(Rooms.quantity).filter_by(id = room_id))).scalar()
             # Если комнат для бронирования нет выводи ошибку
             if not total_rooms - booked_rooms:
-                raise RoomCannotBeBooked
+                raise RoomCannotBeBookedException
             # Получаем стоимость комнаты за 1 день
             price: int = (await session.execute(
                 select(Rooms.price).filter_by(id=room_id))).scalar()
@@ -96,6 +101,6 @@ class BookingDAO(BaseDAO):
     ) -> None:
         # Проверка наличия брони пользователем
         if not await cls.select_one_or_none_filter_by(id=booking_id, user_id=user_id):
-            raise BookingDoesNotExist
+            raise BookingDoesNotExistException
         # Удаляем бронь
         await cls.delete_rows_filer_by(id=booking_id, user_id=user_id)

@@ -1,14 +1,20 @@
+import json
+from sqlalchemy import NullPool
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import DeclarativeBase, sessionmaker
-
 from app.config import settings
 
 
 # Составим ссылку для подключения, требует SQLAlchemy
-databse_url = settings.databse_url
+if settings.mode == "test":
+    databse_url = settings.databse_test_url
+    databse_params = {"poolclass": NullPool}
+else:
+    databse_url = settings.databse_url
+    databse_params = {}
 
 # Создаем движок для подключения
-engine = create_async_engine(databse_url)
+engine = create_async_engine(databse_url, **databse_params)
 
 # Создадим фабрику(Генератор сессий/транзакций)
 async_session_maker = sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)

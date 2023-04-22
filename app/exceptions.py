@@ -36,17 +36,22 @@ UserIsNotAdminException = HTTPException(
     detail="You are not an administrator"
 )
 
-RoomCannotBeBooked = HTTPException(
+RoomCannotBeBookedException = HTTPException(
     status_code=status.HTTP_409_CONFLICT,
     detail="There are no available rooms"
 )
 
-DateFromMoreOrEqualDateTo = HTTPException(
+DateFromMoreOrEqualDateToException = HTTPException(
     status_code=status.HTTP_409_CONFLICT,
     detail="date_from more or equal than date_to"
 )
 
-BookingDoesNotExist = HTTPException(
+BookingDoesNotExistException = HTTPException(
     status_code=status.HTTP_409_CONFLICT,
     detail="booking does not exist"
+)
+
+LongBookingException = HTTPException(
+    status_code=status.HTTP_409_CONFLICT,
+    detail="booking more 30 days"
 )

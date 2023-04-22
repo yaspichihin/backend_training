@@ -32,7 +32,7 @@ async def register_user(
     if await UsersDAO.select_all_filter_by(email=user_data.email):
         raise UserAlreadyExistsException
     # Захешировать пароль
-    hashed_password = get_password_hash(user_data.hashed_password)
+    hashed_password = get_password_hash(user_data.password)
     # Добавить хэш пароля в базу
     await UsersDAO.add_rows(email=user_data.email, hashed_password=hashed_password)
     return "Успешная регистрация"
@@ -42,7 +42,7 @@ async def login_user(
     response: Response,
     user_data: SAuth,
 ) -> str:
-    user = await authenticate_user(user_data.email, user_data.hashed_password)
+    user = await authenticate_user(user_data.email, user_data.password)
     if not user:
         raise IncorrectEmailOrPasswordException
     access_token = create_access_token({"sub": str(user.id)})

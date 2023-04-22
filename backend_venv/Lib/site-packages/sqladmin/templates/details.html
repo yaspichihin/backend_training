@@ -1,0 +1,69 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="col-12">
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title">{{ model_view.pk_column.name }}: {{ model_view.get_prop_value(model, model_view.pk_column) }}</h3>
+    </div>
+    <div class="card-body border-bottom py-3">
+      <div class="table-responsive">
+        <table class="table card-table table-vcenter text-nowrap table-hover table-bordered">
+          <thead>
+            <tr>
+              <th class="w-1">Column</th>
+              <th class="w-1">Value</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for name, prop in model_view._details_props %}
+            <tr>
+              <td>{{ name }}</td>
+              {% set value, formatted_value = model_view.get_detail_value(model, prop) %}
+              {% if prop in model_view._relation_props %}
+              {% if is_list( value ) %}
+              <td>
+              {% for elem, formatted_elem in zip(value, formatted_value) %}
+              <a href="{{ model_view._url_for_details(request, elem) }}">({{ formatted_elem }})</a>
+              {% endfor %}
+              </td>
+              {% else %}
+              <td><a href="{{ model_view._url_for_details_with_prop(request, model, prop) }}">{{ formatted_value }}</a></td>
+              {% endif %}
+              {% else %}
+              <td>{{ formatted_value }}</td>
+              {% endif %}
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      <div class="card-footer container">
+        <div class="row">
+          <div class="col-md-1">
+            <a href="{{ url_for('admin:list', identity=model_view.identity) }}" class="btn">
+              Go Back
+            </a>
+          </div>
+          {% if model_view.can_delete %}
+          <div class="col-md-1">
+            <a href="#" data-name="{{ model_view.name }}" data-pk="{{ model_view.get_prop_value(model, model_view.pk_column) }}" data-url="{{ model_view._url_for_delete(request, model) }}" data-bs-toggle="modal" data-bs-target="#modal-delete" class="btn btn-danger">
+              Delete
+            </a>
+          </div>
+          {% endif %}
+          {% if model_view.can_edit %}
+          <div class="col-md-1">
+            <a href="{{ model_view._url_for_edit(request, model) }}" class="btn btn-primary">
+              Edit
+            </a>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% if model_view.can_delete %}
+{% include 'modals/delete.html' %}
+{% endif %}
+{% endblock %}

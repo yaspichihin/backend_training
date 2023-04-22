@@ -16,6 +16,7 @@ class SBooking(BaseModel):
         orm_mode = True
 
 class SBookingWithRoomInfo(BaseModel):
+    id:          int
     room_id:     int
     user_id:     int
     date_from:   date

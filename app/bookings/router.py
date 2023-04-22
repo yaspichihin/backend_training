@@ -1,6 +1,6 @@
 from datetime import date
-from fastapi import APIRouter, Depends, Response
-from fastapi.responses import PlainTextResponse
+from fastapi import APIRouter, BackgroundTasks, Depends, Response
+from pydantic import parse_obj_as
 
 from app.bookings.dao import BookingDAO
 
@@ -9,6 +9,7 @@ from app.users.models import Users
 from app.bookings.schemas import SBooking, SBookingWithRoomInfo
 
 from app.users.dependencies import get_current_user
+from app.tasks.tasks import send_booking_confirmation_email
 
 
 router = APIRouter(
@@ -26,13 +27,21 @@ async def get_booking(
 # Для бронирования номеров по пользователю
 @router.post("")
 async def add_booking(
+    background_tasks: BackgroundTasks,
     room_id: int,
     date_from: date,
     date_to: date,
     user: Users = Depends(get_current_user),
 ) -> SBooking:
-    return await BookingDAO.add_booking_for_user(
+    booking =  await BookingDAO.add_booking_for_user(
         user.id, room_id, date_from, date_to)
+    booking_dict = parse_obj_as(SBooking, booking).dict()
+    # Вариант с Celery, не забыть включить декоратор в таске
+    #send_booking_confirmation_email.delay(booking_dict, user.email)
+    # Вариант со встроенным BackgroundTasks не забыть выключить декоратор в таске
+    background_tasks.add_task(send_booking_confirmation_email, booking_dict, user.email)
+    return booking_dict
+
 
 @router.delete("/{booking_id}")
 async def delete_booking(
