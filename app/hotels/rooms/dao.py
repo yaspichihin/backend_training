@@ -1,10 +1,8 @@
 from datetime import date
 
-from app.dao.base import BaseDAO
 from app.bookings.dao import BookingDAO
-
+from app.dao.base import BaseDAO
 from app.hotels.rooms.models import Rooms
-
 from app.hotels.rooms.schemas import SRooms, SRoomsRoomLeft
 
 

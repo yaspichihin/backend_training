@@ -1,9 +1,10 @@
 import json
+
 from sqlalchemy import NullPool
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import DeclarativeBase, sessionmaker
-from app.config import settings
 
+from app.config import settings
 
 # Составим ссылку для подключения, требует SQLAlchemy
 if settings.mode == "test":

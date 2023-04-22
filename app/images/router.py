@@ -1,5 +1,6 @@
-from fastapi import APIRouter, Response, UploadFile
 import shutil
+
+from fastapi import APIRouter, Response, UploadFile
 
 from app.tasks.tasks import process_pic
 

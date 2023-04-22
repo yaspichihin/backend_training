@@ -1,12 +1,11 @@
-from fastapi import APIRouter
-from fastapi_cache.decorator import cache
+import asyncio
 from datetime import date, time
 
+from fastapi import APIRouter
+from fastapi_cache.decorator import cache
+
 from app.hotels.dao import HotelsDAO
-
 from app.hotels.schemas import SHotels, SHotelsRoomsLeft
-
-import asyncio
 
 router = APIRouter(
     prefix = "/hotels",

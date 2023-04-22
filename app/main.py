@@ -1,34 +1,23 @@
-from fastapi import FastAPI 
-from fastapi.staticfiles import StaticFiles
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-
-# Настройка Redsi
+from fastapi.staticfiles import StaticFiles
 from fastapi_cache import FastAPICache
 from fastapi_cache.backends.redis import RedisBackend
 from fastapi_cache.decorator import cache
 from redis import asyncio as aioredis
-
-# Настройка админки
 from sqladmin import Admin
-from app.admin.views import BookingsAdmin, HotelsAdmin, RoomsAdmin, UsersAdmin
+
 from app.admin.auth import authentication_backend
-
-from app.db import engine
-from app.config import settings
-
-# Импорт роутеров
+from app.admin.views import BookingsAdmin, HotelsAdmin, RoomsAdmin, UsersAdmin
 from app.bookings.router import router as router_bookings
+from app.config import settings
+from app.db import engine
+from app.hotels.rooms.router import router as router_rooms
+from app.hotels.router import router as router_hotels
+from app.images.router import router as router_images
+from app.pages.router import router as router_pages
 from app.users.router import router_auth as router_auth
 from app.users.router import router_auth as router_user
-from app.hotels.router import router as router_hotels
-from app.hotels.rooms.router import router as router_rooms
-from app.pages.router import router as router_pages
-from app.images.router import router as router_images
-
-import warnings
-warnings.filterwarnings('ignore', 'SelectableGroups dict interface')
-
-
 
 app =  FastAPI()
 

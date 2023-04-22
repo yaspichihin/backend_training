@@ -1,21 +1,22 @@
+import sys
 from logging.config import fileConfig
-
-from sqlalchemy import engine_from_config
-from sqlalchemy import pool
+from os.path import abspath, dirname
 
 from alembic import context
+from sqlalchemy import engine_from_config, pool
 
-import sys
-from os.path import abspath, dirname
 # Передаем информацию alemic, что он находится в папке app, чтобы отрабатывали следующие импорты
 sys.path.insert(0, dirname(dirname(dirname(abspath(__file__))))) 
 
-from app.db import Base     # Если импортировать только его, то он пустой по умолчанию. Нужно импортировать и все модели.
-from app.hotels.models import Hotels        # Импорт модели для передачи данных в Base
-from app.hotels.rooms.models import Rooms          # Импорт модели для передачи данных в Base
-from app.users.models import Users          # Импорт модели для передачи данных в Base
-from app.bookings.models import Bookings    # Импорт модели для передачи данных в Base
-from app.config import settings             # Импорт логинов, паролей и прочего
+from app.bookings.models import Bookings  # Импорт модели для передачи данных в Base
+from app.config import settings  # Импорт логинов, паролей и прочего
+from app.db import (
+    Base,  # Если импортировать только его, то он пустой по умолчанию. Нужно импортировать и все модели.
+)
+from app.hotels.models import Hotels        # noqa  # Импорт модели для передачи данных в Base
+from app.hotels.rooms.models import Rooms   # noqa  # Импорт модели для передачи данных в Base
+from app.users.models import Users          # noqa  # Импорт модели для передачи данных в Base
+from app.bookings.models import Bookings    # noqa  # Импорт модели для передачи данных в Base
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

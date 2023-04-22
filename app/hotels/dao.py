@@ -1,13 +1,12 @@
 from datetime import date
+
 from sqlalchemy import func
 
-from app.hotels.models import Hotels
-from app.hotels.rooms.models import Rooms
-
-from app.dao.base import BaseDAO
 from app.bookings.dao import BookingDAO
+from app.dao.base import BaseDAO
+from app.hotels.models import Hotels
 from app.hotels.rooms.dao import RoomsDAO
-
+from app.hotels.rooms.models import Rooms
 from app.hotels.schemas import SHotelsRoomsLeft
 
 

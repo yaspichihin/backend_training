@@ -1,6 +1,7 @@
 import warnings
-from httpx import AsyncClient
+
 import pytest
+from httpx import AsyncClient
 
 
 # Прописали params чтобы обойти pydantic

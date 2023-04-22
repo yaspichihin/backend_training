@@ -1,18 +1,17 @@
 from datetime import datetime
+
 from fastapi import Depends, Request
-from jose import jwt, JWTError
+from jose import JWTError, jwt
 
 from app.config import settings
-
-from app.users.dao import UsersDAO
-
-from app.users.models import Users
-
 from app.exceptions import (
     IncorrcetTokenFormatException,
     TokenAbsentException,
     TokenExpiredException,
-    UserIsNotPresentException)
+    UserIsNotPresentException,
+)
+from app.users.dao import UsersDAO
+from app.users.models import Users
 
 
 # Получение данных, которые должны храниться в токене клиента
