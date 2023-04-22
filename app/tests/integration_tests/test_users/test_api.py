@@ -20,7 +20,7 @@ async def  test_register_user(
 
 @pytest.mark.parametrize("email,password,status_code", [
     ("test@test.com", "test", 200),                 # Успешная аутентификация
-    ("test@test.com", "wrong_password", 401),       # Ошибочный парлоль
+    ("test@test.com", "wrong_password", 401),       # Ошибочный пароль
     ("not_exists@example.com", "password", 401),    # Несуществующий пользователь
 ])
 async def  test_login_user(
