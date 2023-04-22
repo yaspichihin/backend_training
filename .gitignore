@@ -3,5 +3,4 @@ backend_venv
 .env-non-dev
 .env-render
 __pycache__
-# *.ipynb*
 .pytest_cache
