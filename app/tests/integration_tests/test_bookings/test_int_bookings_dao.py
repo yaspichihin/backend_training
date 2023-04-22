@@ -2,13 +2,13 @@ from datetime import datetime
 
 from app.bookings.dao import BookingDAO
 
+
 data = {
     "user_id": 2,
     "room_id": 2,
     "date_from": datetime.strptime("2023-07-01", "%Y-%m-%d"),
     "date_to": datetime.strptime("2023-07-15", "%Y-%m-%d"),
 }
-
 
 # Провеока добавлиния бронирования
 async def test_crud_booking():
