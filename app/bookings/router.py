@@ -2,6 +2,7 @@ from datetime import date
 
 from fastapi import APIRouter, BackgroundTasks, Depends, Response
 from pydantic import parse_obj_as
+from fastapi_versioning import version
 
 from app.bookings.dao import BookingDAO
 from app.bookings.schemas import SBooking, SBookingWithRoomInfo
@@ -14,13 +15,15 @@ router = APIRouter(prefix="/bookings", tags=["Bookings"])
 
 # Вернуть все забронированные номера пользователем
 @router.get("")
+@version(1)
 async def get_booking(user: Users = Depends(get_current_user)) -> list[SBookingWithRoomInfo]:
     return await BookingDAO.get_booking_for_user(user)
 
 # Для бронирования номеров по пользователю
 @router.post("")
+@version(1)
 async def add_booking(background_tasks: BackgroundTasks,
-    room_id: int, date_from: date, date_to: date, user: Users = Depends(get_current_user)) -> SBooking:
+    room_id: int, date_from: date, date_to: date, user: Users = Depends(get_current_user)) -> dict:
     booking = await BookingDAO.add_booking_for_user(
         user.id, room_id, date_from, date_to
     )
@@ -32,6 +35,7 @@ async def add_booking(background_tasks: BackgroundTasks,
     return booking_dict
 
 @router.delete("/{booking_id}")
+@version(1)
 async def delete_booking(response: Response,
     booking_id: int, user: Users = Depends(get_current_user)) -> None:
     await BookingDAO.delete_booking_for_user(booking_id=int(booking_id), user_id=user.id)

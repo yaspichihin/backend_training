@@ -9,6 +9,7 @@ from app.users.schemas import SAuth, SUsers
 
 
 router_auth = APIRouter(prefix="/auth", tags=["Auth"])
+router_user = APIRouter(prefix="/user", tags=["Users"])
 
 @router_auth.post("/register")
 async def register_user(user_data: SAuth) -> str:
@@ -35,9 +36,6 @@ async def logout_user(response: Response) -> str:
     # Добавляем Response для удаления куки
     response.delete_cookie("booking_access_token")
     return "Успешный выход"
-
-
-router_user = APIRouter(prefix="/user", tags=["Users"])
 
 @router_user.get("/me")
 async def get_me(current_user: Users = Depends(get_current_user)) -> SUsers:

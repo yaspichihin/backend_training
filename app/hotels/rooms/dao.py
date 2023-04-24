@@ -20,7 +20,7 @@ class RoomsDAO(BaseDAO):
         # Подсчитаем доступное количество комнат
         for room in rooms:
             rooms_qty = room.quantity
-            rooms_booked = len(
+            rooms_booked: int = len(
                 await BookingDAO.get_booked_rooms(room.id, date_from, date_to))
             rooms_left: int = rooms_qty - rooms_booked
             if rooms_left:

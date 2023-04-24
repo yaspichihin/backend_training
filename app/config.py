@@ -5,6 +5,8 @@ from pydantic import BaseSettings
 
 class Settings(BaseSettings):
     mode: Literal["dev", "test", "prod"]  # Фиксированное множество 1 из значений
+    log_level: Literal["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
+    sentry_dsn: str
 
     db_host: str
     db_port: int

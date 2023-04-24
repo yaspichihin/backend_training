@@ -9,5 +9,9 @@ class SAuth(BaseModel):
         orm_mode = True
 
 
-class SUsers(SAuth):
+class SUsers(BaseModel):
     id: int
+    email: EmailStr
+
+    class Config:
+        orm_mode = True

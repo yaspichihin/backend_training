@@ -22,7 +22,7 @@ def process_pic(path: str):
 # @celery_app.task # Отклчить декоратор если используем BackgroundTasks
 def send_booking_confirmation_email(booking: dict, email_to: EmailStr):
     email_to_mock = settings.smtp_user  # Отправим письмо самому себе для тестирования
-    msg_content = create_booking_confirmation_template(booking, email_to_mock)
+    msg_content: str = create_booking_confirmation_template(booking, email_to_mock)
 
     # context = ssl.SSLContext(ssl.PROTOCOL_TLS)
     context = ssl.create_default_context()
